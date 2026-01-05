@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FSM Visualizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>FSM Visualizer</h1>
+      <p class="subtitle">Extract state machines from SystemVerilog and generate diagrams</p>
+    </header>
+
+    <main>
+      <section class="input-section">
+        <h2>Input</h2>
+        <div class="editor-container">
+          <div class="line-numbers" id="lineNumbers"></div>
+          <textarea
+            id="sourceInput"
+            class="code-input"
+            placeholder="// Paste your SystemVerilog FSM code here...
+typedef enum logic [1:0] {IDLE, RUN, DONE} state_t;
+state_t state, next_state;
+
+always_ff @(posedge clk or negedge rst_n)
+    if (!rst_n) state <= IDLE;
+    else state <= next_state;
+
+always_comb begin
+    next_state = state;
+    case (state)
+        IDLE: if (start) next_state = RUN;
+        RUN: if (done) next_state = DONE;
+        DONE: next_state = IDLE;
+    endcase
+end"
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <label for="direction">Direction:</label>
+            <select id="direction">
+              <option value="TB">Top to Bottom</option>
+              <option value="LR">Left to Right</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="showConditions" checked>
+              Show Conditions
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="showOutputs">
+              Show Outputs
+            </label>
+          </div>
+
+          <div class="control-group" id="fsmSelectorGroup" style="display: none;">
+            <label for="fsmSelector">FSM:</label>
+            <select id="fsmSelector"></select>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="extractBtn" class="primary-btn">Extract FSM</button>
+          <button id="resetBtn" class="secondary-btn">Reset</button>
+        </div>
+      </section>
+
+      <section class="output-section" id="outputSection" style="display: none;">
+        <h2>Results</h2>
+
+        <div class="diagram-container">
+          <h3>Diagram</h3>
+          <div id="diagramOutput" class="diagram"></div>
+        </div>
+
+        <div class="warnings-container" id="warningsContainer" style="display: none;">
+          <h3>
+            Warnings
+            <button class="toggle-btn" id="toggleWarnings">Hide</button>
+          </h3>
+          <div id="warningsList" class="warnings-list"></div>
+        </div>
+
+        <div class="mermaid-container">
+          <h3>
+            Mermaid Code
+            <button class="copy-btn" id="copyMermaid">Copy</button>
+          </h3>
+          <pre id="mermaidOutput" class="code-output"></pre>
+        </div>
+
+        <div class="stats-container">
+          <h3>Statistics</h3>
+          <div id="statsOutput" class="stats"></div>
+        </div>
+      </section>
+
+      <section class="help-section">
+        <h2>How It Works</h2>
+
+        <details>
+          <summary>Supported Patterns</summary>
+          <ul>
+            <li><code>typedef enum</code> state definitions</li>
+            <li><code>always_ff</code> / <code>always_comb</code> blocks</li>
+            <li><code>case</code> statements with state transitions</li>
+            <li>One-block, two-block, and three-block FSM styles</li>
+          </ul>
+        </details>
+
+        <details>
+          <summary>Tips</summary>
+          <ul>
+            <li>Paste a complete module or just the FSM portion</li>
+            <li>Use descriptive state names (IDLE, RUN, DONE)</li>
+            <li>Include your reset logic for proper initial state detection</li>
+          </ul>
+        </details>
+
+        <details>
+          <summary>Known Limitations</summary>
+          <ul>
+            <li><code>localparam</code> state definitions are not supported</li>
+            <li>Package imports (<code>import pkg::*</code>) are not resolved</li>
+            <li><code>`include</code> and macros are not preprocessed</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <a href="https://github.com/bitwizlabs/fsm_viz" target="_blank">GitHub</a>
+        |
+        Built with <a href="https://tree-sitter.github.io/" target="_blank">tree-sitter</a>
+        and <a href="https://mermaid.js.org/" target="_blank">Mermaid</a>
+      </p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="fsm-viz.ts"></script>
+</body>
+</html>
