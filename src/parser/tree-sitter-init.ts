@@ -47,15 +47,34 @@ async function doInit(): Promise<Parser> {
   } else {
     // Node.js: load WASM from filesystem (reads file, not HTTP)
     const path = await import('path');
+    const fs = await import('fs');
     const { fileURLToPath } = await import('url');
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
     await Parser.init();
     const parser = new Parser();
 
-    // After esbuild bundles to dist/cli.mjs, WASM files are in dist/ alongside it
-    // The build-wasm.sh script copies WASM to both public/ and dist/
-    const wasmPath = path.join(__dirname, 'tree-sitter-systemverilog.wasm');
+    // Try multiple locations for the WASM file:
+    // 1. Same directory as script (for bundled CLI in dist/)
+    // 2. node_modules/tree-sitter-systemverilog (for tests)
+    const possiblePaths = [
+      path.join(__dirname, 'tree-sitter-systemverilog.wasm'),
+      path.resolve(__dirname, '..', '..', 'node_modules', 'tree-sitter-systemverilog', 'tree-sitter-systemverilog.wasm'),
+      path.resolve(process.cwd(), 'node_modules', 'tree-sitter-systemverilog', 'tree-sitter-systemverilog.wasm'),
+    ];
+
+    let wasmPath: string | null = null;
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        wasmPath = p;
+        break;
+      }
+    }
+
+    if (!wasmPath) {
+      throw new Error(`Could not find tree-sitter-systemverilog.wasm. Searched: ${possiblePaths.join(', ')}`);
+    }
+
     const lang = await Language.load(wasmPath);
     parser.setLanguage(lang);
     parserInstance = parser;
