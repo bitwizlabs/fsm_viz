@@ -101,7 +101,7 @@ function extractVariableNames(declNode: SyntaxNode, text: string): string[] {
     if (node.type === 'variable_decl_assignment') {
       // Get the identifier from this assignment
       const identNode = node.children.find(
-        (c) => c.type === 'simple_identifier' || c.type === 'identifier'
+        (c: SyntaxNode) => c.type === 'simple_identifier' || c.type === 'identifier'
       );
       if (identNode) {
         names.push(getNodeText(identNode).trim());

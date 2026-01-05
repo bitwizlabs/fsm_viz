@@ -1,6 +1,6 @@
-import type Parser from 'web-tree-sitter';
+import type { Node } from 'web-tree-sitter';
 
-export type SyntaxNode = Parser.SyntaxNode;
+export type SyntaxNode = Node;
 
 /**
  * Walk the AST and call visitor for each node.
@@ -49,14 +49,14 @@ export function findFirstNodeOfType(root: SyntaxNode, type: string): SyntaxNode 
  * Find all direct children of a specific type.
  */
 export function getChildrenOfType(node: SyntaxNode, type: string): SyntaxNode[] {
-  return node.children.filter((child) => child.type === type);
+  return node.children.filter((child: SyntaxNode) => child.type === type);
 }
 
 /**
  * Find the first direct child of a specific type.
  */
 export function getChildOfType(node: SyntaxNode, type: string): SyntaxNode | null {
-  return node.children.find((child) => child.type === type) || null;
+  return node.children.find((child: SyntaxNode) => child.type === type) || null;
 }
 
 /**
@@ -107,7 +107,7 @@ export function isInsideNodeOfType(node: SyntaxNode, type: string): boolean {
 export function getSiblings(node: SyntaxNode): SyntaxNode[] {
   const parent = node.parent;
   if (!parent) return [];
-  return parent.children.filter((child) => child !== node);
+  return parent.children.filter((child: SyntaxNode) => child !== node);
 }
 
 /**
@@ -144,7 +144,7 @@ export function getASTSummary(node: SyntaxNode, maxDepth = 3, depth = 0): string
     return `${node.type}[...]`;
   }
 
-  const children = node.children.map((c) => getASTSummary(c, maxDepth, depth + 1));
+  const children = node.children.map((c: SyntaxNode) => getASTSummary(c, maxDepth, depth + 1));
 
   if (children.length === 0) {
     const text = node.text.length > 20 ? node.text.slice(0, 20) + '...' : node.text;

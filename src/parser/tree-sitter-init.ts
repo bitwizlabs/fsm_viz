@@ -1,4 +1,4 @@
-import { Parser, Language } from 'web-tree-sitter';
+import { Parser, Language, Tree } from 'web-tree-sitter';
 
 // Check for browser vs Node.js (NOT import.meta.env which is Vite-specific)
 const isBrowser = typeof window !== 'undefined';
@@ -69,9 +69,13 @@ async function doInit(): Promise<Parser> {
  * @param source - SystemVerilog source code string
  * @returns Promise resolving to the parsed tree
  */
-export async function parseSystemVerilog(source: string): Promise<Parser.Tree> {
+export async function parseSystemVerilog(source: string): Promise<Tree> {
   const parser = await initParser();
-  return parser.parse(source);
+  const tree = parser.parse(source);
+  if (!tree) {
+    throw new Error('Failed to parse source code');
+  }
+  return tree;
 }
 
 /**
