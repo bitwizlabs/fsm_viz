@@ -48,8 +48,8 @@ jobs:
 
       - name: Test CLI
         run: |
-          node dist/cli.mjs check tests/fixtures/simple-fsm.sv
-          node dist/cli.mjs extract tests/fixtures/simple-fsm.sv
+          node dist/cli.mjs check tests/fixtures/verilog-fsm.sv
+          node dist/cli.mjs extract tests/fixtures/verilog-fsm.sv
 
   lint:
     runs-on: ubuntu-latest
