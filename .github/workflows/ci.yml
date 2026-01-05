@@ -43,11 +43,8 @@ jobs:
       - name: Build Web
         run: npm run build
 
-      - name: Verify WASM files exist
-        run: |
-          test -f public/tree-sitter.wasm
-          test -f public/tree-sitter-systemverilog.wasm
-          test -f dist/tree-sitter-systemverilog.wasm
+      - name: Copy WASM for CLI
+        run: cp tree-sitter-systemverilog.wasm dist/
 
       - name: Test CLI
         run: |
@@ -98,12 +95,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build tree-sitter WASM
+        run: npx tree-sitter build --wasm node_modules/tree-sitter-systemverilog
+
       - name: Build Web
         run: npm run build
 
       - name: Copy WASM to dist
         run: |
-          cp public/tree-sitter-systemverilog.wasm dist/web/
+          cp tree-sitter-systemverilog.wasm dist/web/
           cp node_modules/web-tree-sitter/web-tree-sitter.wasm dist/web/
 
       - name: Setup Pages
